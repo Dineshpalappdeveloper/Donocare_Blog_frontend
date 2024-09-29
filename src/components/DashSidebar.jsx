@@ -6,6 +6,7 @@ import {
   HiOutlineUserGroup,
   HiAnnotation,
   HiChartPie,
+  HiOutlineUpload,
 } from 'react-icons/hi';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -42,10 +43,15 @@ export default function DashSidebar() {
       if (!res) {
         console.log(data.message);
       } else {
+        Cookies.remove("token", { path: '/' });
+        Cookies.remove("token", { path: '', domain: window.location.hostname }); // Ensure removal from root path and domain
+
         dispatch(signoutSuccess());
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
   return (
@@ -87,6 +93,28 @@ export default function DashSidebar() {
           )}
           {currentUser.isAdmin && (
             <>
+              <Link to='/dashboard?tab=create'>
+                <Sidebar.Item
+                  active={tab === 'create'}
+                  icon={HiOutlineUpload}
+                  as='div'
+                >
+                  Create Post
+                </Sidebar.Item>
+              </Link>
+              {/* <Link to='/dashboard?tab=update'>
+                <Sidebar.Item
+                  active={tab === 'update'}
+                  icon={HiAnnotation}
+                  as='div'
+                >
+                  Update 
+                </Sidebar.Item>
+              </Link> */}
+            </>
+          )}
+          {currentUser.isAdmin && (
+            <>
               <Link to='/dashboard?tab=users'>
                 <Sidebar.Item
                   active={tab === 'users'}
@@ -107,6 +135,7 @@ export default function DashSidebar() {
               </Link>
             </>
           )}
+
           <Sidebar.Item
             icon={HiArrowSmRight}
             className='cursor-pointer'

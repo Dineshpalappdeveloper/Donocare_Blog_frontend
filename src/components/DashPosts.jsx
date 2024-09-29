@@ -35,6 +35,8 @@ export default function DashPosts() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     if (currentUser.isAdmin) {
@@ -62,6 +64,8 @@ export default function DashPosts() {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -86,6 +90,8 @@ export default function DashPosts() {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 

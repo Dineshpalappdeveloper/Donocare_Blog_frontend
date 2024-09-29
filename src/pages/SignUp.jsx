@@ -1,7 +1,9 @@
+import axios from 'axios';
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import OAuth from '../components/OAuth';
+import { URL } from '../utils/Auth';
+// import OAuth from '../components/OAuth';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -19,22 +21,30 @@ export default function SignUp() {
     try {
       setLoading(true);
       setErrorMessage(null);
-      const res = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (data.success === false) {
+
+      const res = await axios.post(
+        `${URL}/api/auth/signup`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      const data = await res.data;
+
+      if (!data) {
         return setErrorMessage(data.message);
       }
       setLoading(false);
-      if (res.ok) {
+      if (res) {
         navigate('/sign-in');
       }
     } catch (error) {
       setErrorMessage(error.message);
       setLoading(false);
+      alert(error?.response?.data?.message)
+
     }
   };
   return (
@@ -98,7 +108,7 @@ export default function SignUp() {
                 'Sign Up'
               )}
             </Button>
-            <OAuth />
+            {/* <OAuth /> */}
           </form>
           <div className='flex gap-2 text-sm mt-5'>
             <span>Have an account?</span>

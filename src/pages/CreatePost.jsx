@@ -12,6 +12,9 @@ import { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { URL } from '../utils/Auth';
+import Cookies from "js-cookie";
 
 export default function CreatePost() {
   const [file, setFile] = useState(null);
@@ -19,6 +22,7 @@ export default function CreatePost() {
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
   const [publishError, setPublishError] = useState(null);
+  const token = Cookies.get("token");
 
   const navigate = useNavigate();
 
@@ -61,20 +65,25 @@ export default function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/post/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (!res.ok) {
+
+      const res = await axios.post(
+        `${URL}/api/post/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      const data = await res.data;
+
+      if (!res) {
         setPublishError(data.message);
         return;
       }
 
-      if (res.ok) {
+      if (res) {
         setPublishError(null);
         navigate(`/post/${data.slug}`);
       }
@@ -82,6 +91,37 @@ export default function CreatePost() {
       setPublishError('Something went wrong');
     }
   };
+  const modules = {
+    toolbar: [
+      [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+      [{ size: [] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      ['link'],
+      [{ 'align': [] }],
+      ['clean']
+    ]
+  };
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link'
+  ]
+  const styles = `
+  .ql-container {
+    background-color: white;
+  }
+  .ql-editor {
+    color: black;
+    min-height: 18rem; /* Ensure height remains consistent */
+  }
+`;
+  const CustomStyles = () => (
+    <style>{styles}</style>
+  );
+  console.log(token, 'token');
+
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
@@ -102,10 +142,10 @@ export default function CreatePost() {
               setFormData({ ...formData, category: e.target.value })
             }
           >
-            <option value='uncategorized'>Select a category</option>
-            <option value='javascript'>JavaScript</option>
-            <option value='reactjs'>React.js</option>
-            <option value='nextjs'>Next.js</option>
+            <option value="uncategorized">Select a category</option>
+            <option value="Technology">Technology</option>
+            <option value="Bussiness">Bussiness</option>
+            <option value="Others">Others</option>
           </Select>
         </div>
         <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
@@ -142,10 +182,14 @@ export default function CreatePost() {
             className='w-full h-72 object-cover'
           />
         )}
+        <CustomStyles />
+
         <ReactQuill
           theme='snow'
           placeholder='Write something...'
           className='h-72 mb-12'
+          modules={modules}
+          formats={formats}
           required
           onChange={(value) => {
             setFormData({ ...formData, content: value });

@@ -4,22 +4,36 @@ import { FaThumbsUp } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Button, Textarea } from 'flowbite-react';
 import { set } from 'mongoose';
+import Cookies from "js-cookie";
+import axios from 'axios';
+import { URL } from '../utils/Auth';
 
 export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
   const { currentUser } = useSelector((state) => state.user);
+  const token = Cookies.get("token");
+
   useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await fetch(`/api/user/${comment.userId}`);
-        const data = await res.json();
-        if (res.ok) {
+
+
+        const res = await axios.get(`${URL}/api/user/${comment.userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.data;
+        if (res) {
           setUser(data);
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     getUser();
@@ -32,21 +46,28 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/api/comment/editComment/${comment._id}`, {
-        method: 'PUT',
+      const body = {
+        content: editedContent,
+
+      }
+      const res = await axios.put(`${URL}/api/comment/editComment/${comment._id}`, body, {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
+
         },
-        body: JSON.stringify({
-          content: editedContent,
-        }),
       });
-      if (res.ok) {
+
+      const data = await res.data;
+
+      if (res) {
         setIsEditing(false);
         onEdit(comment, editedContent);
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
   return (
@@ -101,19 +122,18 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
               <button
                 type='button'
                 onClick={() => onLike(comment._id)}
-                className={`text-gray-400 hover:text-blue-500 ${
-                  currentUser &&
+                className={`text-gray-400 hover:text-blue-500 ${currentUser &&
                   comment.likes.includes(currentUser._id) &&
                   '!text-blue-500'
-                }`}
+                  }`}
               >
                 <FaThumbsUp className='text-sm' />
               </button>
               <p className='text-gray-400'>
                 {comment.numberOfLikes > 0 &&
                   comment.numberOfLikes +
-                    ' ' +
-                    (comment.numberOfLikes === 1 ? 'like' : 'likes')}
+                  ' ' +
+                  (comment.numberOfLikes === 1 ? 'like' : 'likes')}
               </p>
               {currentUser &&
                 (currentUser._id === comment.userId || currentUser.isAdmin) && (

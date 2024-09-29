@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import axios from 'axios';
+import Cookies from "js-cookie";
+import { URL } from '../utils/Auth';
 
 export default function DashComments() {
   const { currentUser } = useSelector((state) => state.user);
@@ -10,12 +13,24 @@ export default function DashComments() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState('');
+  const token = Cookies.get("token");
+
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/comment/getcomments`);
-        const data = await res.json();
-        if (res.ok) {
+
+        const res = await axios.get(
+          `${URL}/api/comment/getcomments`,
+
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          }
+        );
+        const data = await res.data;
+        if (res) {
           setComments(data.comments);
           if (data.comments.length < 9) {
             setShowMore(false);
@@ -23,6 +38,8 @@ export default function DashComments() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     if (currentUser.isAdmin) {
@@ -45,6 +62,8 @@ export default function DashComments() {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -68,6 +87,8 @@ export default function DashComments() {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 

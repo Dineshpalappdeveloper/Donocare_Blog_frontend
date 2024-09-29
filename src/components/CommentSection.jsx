@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Comment from './Comment';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import Cookies from "js-cookie"; // Make sure to import Cookies
+import { URL } from '../utils/Auth';
+import axios from 'axios';
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
@@ -23,25 +25,30 @@ export default function CommentSection({ postId }) {
       return;
     }
     try {
-      const res = await fetch('/api/comment/create', {
-        method: 'POST',
+      const body = {
+        content: comment,
+        postId,
+        userId: currentUser._id,
+
+      }
+      const res = await axios.post(`${URL}/api/comment/create`, body, {
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+
         },
-        body: JSON.stringify({
-          content: comment,
-          postId,
-          userId: currentUser._id,
-        }),
       });
-      const data = await res.json();
-      if (res.ok) {
+
+      const data = await res.data;
+      if (res) {
         setComment('');
         setCommentError(null);
         setComments([data, ...comments]);
       }
     } catch (error) {
       setCommentError(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -51,6 +58,8 @@ export default function CommentSection({ postId }) {
         const res = await axios.get(`${URL}/api/comment/getPostComments/${postId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+
           },
         });
         if (res) {
@@ -59,6 +68,8 @@ export default function CommentSection({ postId }) {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     getComments();
@@ -70,11 +81,16 @@ export default function CommentSection({ postId }) {
         navigate('/sign-in');
         return;
       }
-      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
-        method: 'PUT',
+
+      const res = await axios.put(`${URL}/api/comment/likeComment/${commentId}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (res.ok) {
-        const data = await res.json();
+
+      const data = await res.data;
+
+      if (res) {
         setComments(
           comments.map((comment) =>
             comment._id === commentId
@@ -89,6 +105,8 @@ export default function CommentSection({ postId }) {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -107,15 +125,21 @@ export default function CommentSection({ postId }) {
         navigate('/sign-in');
         return;
       }
-      const res = await fetch(`/api/comment/deleteComment/${commentId}`, {
-        method: 'DELETE',
+
+      const res = await axios.delete(`${URL}/api/comment/deleteComment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      if (res.ok) {
-        const data = await res.json();
+
+      const data = await res.data;
+      if (res) {
         setComments(comments.filter((comment) => comment._id !== commentId));
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
   return (

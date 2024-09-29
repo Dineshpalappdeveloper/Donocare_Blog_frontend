@@ -43,6 +43,8 @@ export default function DashboardComp() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     const fetchPosts = async () => {
@@ -62,6 +64,8 @@ export default function DashboardComp() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     const fetchComments = async () => {
@@ -81,6 +85,8 @@ export default function DashboardComp() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     if (currentUser.isAdmin) {

@@ -116,15 +116,16 @@ export default function DashProfile() {
     }
     try {
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: 'PUT',
+
+      const res = await axios.put(`${URL}/api/user/update/${currentUser._id}`, formData, {
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
       });
-      const data = await res.json();
-      if (!res.ok) {
+
+      const data = await res.data;
+
+      if (!res) {
         dispatch(updateFailure(data.message));
         setUpdateUserError(data.message);
       } else {
@@ -134,23 +135,33 @@ export default function DashProfile() {
     } catch (error) {
       dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
+      alert(error?.response?.data?.message)
+
+
     }
   };
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
-      dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: 'DELETE',
+
+      const res = await axios.delete(`${URL}/api/user/delete/${currentUser._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const data = await res.json();
-      if (!res.ok) {
+
+      const data = await res.data;
+      dispatch(deleteUserStart());
+
+      if (!res) {
         dispatch(deleteUserFailure(data.message));
       } else {
         dispatch(deleteUserSuccess(data));
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -166,10 +177,15 @@ export default function DashProfile() {
       if (!res) {
         console.log(data.message);
       } else {
+        Cookies.remove("token", { path: '/' });
+        Cookies.remove("token", { path: '', domain: window.location.hostname }); // Ensure removal from root path and domain
+
         dispatch(signoutSuccess());
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
   return (
@@ -224,12 +240,16 @@ export default function DashProfile() {
           id='username'
           placeholder='username'
           defaultValue={currentUser.username}
+
+          pattern="[a-z]+" // Pattern to allow only lowercase letters
+          title="Only lowercase letters are allowed" // Tooltip on invalid input
           onChange={handleChange}
         />
         <TextInput
           type='email'
           id='email'
           placeholder='email'
+          disabled
           defaultValue={currentUser.email}
           onChange={handleChange}
         />
@@ -259,8 +279,16 @@ export default function DashProfile() {
           </Link>
         )}
       </form>
-      <div className='text-red-500 flex justify-between mt-5'>
-        <span onClick={() => setShowModal(true)} className='cursor-pointer'>
+      <div className='text-red-500 flex justify-end mt-5'>
+        <span onClick={() => {
+          if (!currentUser?.isAdmin) {
+            setShowModal(true)
+
+          } else {
+            alert("Access Denied")
+          }
+        }}
+          className={`${currentUser?.isAdmin ? "cursor-not-allowed" : "cursor-pointer"} hidden`}>
           Delete Account
         </span>
         <span onClick={handleSignout} className='cursor-pointer'>

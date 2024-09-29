@@ -3,19 +3,33 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import axios from 'axios';
+import { URL } from '../utils/Auth';
+import Cookies from "js-cookie";
 
 export default function DashUsers() {
   const { currentUser } = useSelector((state) => state.user);
   const [users, setUsers] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const token = Cookies.get("token");
+
   const [userIdToDelete, setUserIdToDelete] = useState('');
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`/api/user/getusers`);
-        const data = await res.json();
-        if (res.ok) {
+
+        const res = await axios.get(
+          `${URL}/api/user/getusers`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          }
+        );
+        const data = await res.data;
+        if (res) {
           setUsers(data.users);
           if (data.users.length < 9) {
             setShowMore(false);
@@ -23,6 +37,8 @@ export default function DashUsers() {
         }
       } catch (error) {
         console.log(error.message);
+        alert(error?.response?.data?.message)
+
       }
     };
     if (currentUser.isAdmin) {
@@ -43,23 +59,27 @@ export default function DashUsers() {
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
   const handleDeleteUser = async () => {
     try {
-        const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
-            method: 'DELETE',
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
-            setShowModal(false);
-        } else {
-            console.log(data.message);
-        }
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setShowModal(false);
+      } else {
+        console.log(data.message);
+      }
     } catch (error) {
-        console.log(error.message);
+      console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
@@ -101,10 +121,14 @@ export default function DashUsers() {
                   <Table.Cell>
                     <span
                       onClick={() => {
-                        setShowModal(true);
-                        setUserIdToDelete(user._id);
+                        if (currentUser?.isSuperAdmin) {
+                          setShowModal(true);
+                          setUserIdToDelete(user._id);
+                        } else {
+                          alert("Access Denied")
+                        }
                       }}
-                      className='font-medium text-red-500 hover:underline cursor-pointer'
+                      className={`font-medium text-red-500 hover:underline  ${currentUser?.isSuperAdmin ? "cursor-pointer" : "cursor-not-allowed"}`}
                     >
                       Delete
                     </span>

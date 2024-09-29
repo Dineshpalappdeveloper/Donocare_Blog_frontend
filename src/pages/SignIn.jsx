@@ -22,7 +22,6 @@ export default function SignIn() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
-  console.log(loading, 'loading', errorMessage, 'errorMessage');
 
   const handleSubmit = async (e) => {
     console.log(loading, 'loading55', errorMessage, 'e125rrorMessage');
@@ -33,25 +32,35 @@ export default function SignIn() {
     }
     try {
       dispatch(signInStart());
-      // const res = await fetch('/api/auth/signin', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData),
-      // });
-      const res = await axios.post(`${URL}/api/auth/signin`, formData);
+
+      const res = await axios.post(`${URL}/api/auth/signin`, formData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       const data = await res.data;
       console.log(data, "dataresponse");
 
-      if (data === false) {
+      if (!data) {
         dispatch(signInFailure(data.message));
       }
 
       if (res) {
+        const { token } = data;
+
+        // Set the access_token in the cookie with appropriate options
+        Cookies.set('token', token, {
+          expires: 30,           // Cookie will expire in 30 days
+          secure: process.env.NODE_ENV === 'production', // Send cookie over HTTPS only in production
+          sameSite: 'Strict',     // Strict same-site policy to prevent CSRF
+        });
         dispatch(signInSuccess(data));
         navigate('/');
+        console.log(data.token, "dataresponse");
+
       }
     } catch (error) {
       dispatch(signInFailure(error.message));
+      alert(error?.response?.data?.message)
+
     }
   };
   return (

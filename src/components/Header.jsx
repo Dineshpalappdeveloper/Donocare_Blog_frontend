@@ -20,6 +20,7 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
   const [searchTerm, setSearchTerm] = useState('');
+  console.log(currentUser, 'currentUser');
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -41,10 +42,15 @@ export default function Header() {
       if (!res) {
         console.log(data.message);
       } else {
+        Cookies.remove("token", { path: '/' });
+        Cookies.remove("token", { path: '', domain: window.location.hostname }); // Ensure removal from root path and domain
+
         dispatch(signoutSuccess());
       }
     } catch (error) {
       console.log(error.message);
+      alert(error?.response?.data?.message)
+
     }
   };
 
