@@ -4,6 +4,9 @@ import { Link, useParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
+import Cookies from "js-cookie"; // Make sure to import Cookies
+import axios from 'axios';
+import { URL } from '../utils/Auth';
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -11,19 +14,27 @@ export default function PostPage() {
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState(null);
+  const token = Cookies.get("token");
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
-        const data = await res.json();
-        if (!res.ok) {
+
+        const res = await axios.get(`${URL}/api/post/getposts?slug=${postSlug}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.data
+
+
+        if (!res) {
           setError(true);
           setLoading(false);
           return;
         }
-        if (res.ok) {
+        if (res) {
           setPost(data.posts[0]);
           setLoading(false);
           setError(false);
@@ -39,9 +50,14 @@ export default function PostPage() {
   useEffect(() => {
     try {
       const fetchRecentPosts = async () => {
-        const res = await fetch(`/api/post/getposts?limit=3`);
-        const data = await res.json();
-        if (res.ok) {
+
+        const res = await axios.get(`${URL}/api/post/getposts?limit=3`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.data
+        if (res) {
           setRecentPosts(data.posts);
         }
       };

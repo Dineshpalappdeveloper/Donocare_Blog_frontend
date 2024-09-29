@@ -6,11 +6,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../redux/theme/themeSlice';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useEffect, useState } from 'react';
+import Cookies from "js-cookie";
+import axios from 'axios';
+import { URL } from '../utils/Auth';
 
 export default function Header() {
   const path = useLocation().pathname;
   const location = useLocation();
   const navigate = useNavigate();
+  const token = Cookies.get("token");
+
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
@@ -26,11 +31,14 @@ export default function Header() {
 
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout', {
-        method: 'POST',
+      const res = await axios.post(`${URL}/api/user/signout`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const data = await res.json();
-      if (!res.ok) {
+
+      const data = await res.data;
+      if (!res) {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());

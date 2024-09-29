@@ -7,34 +7,46 @@ import {
   signInSuccess,
   signInFailure,
 } from '../redux/user/userSlice';
+import axios from 'axios';
+import Cookies from "js-cookie"; // Make sure to import Cookies
+import { URL } from '../utils/Auth';
+
 // import OAuth from '../components/OAuth';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const { loading, error: errorMessage } = useSelector((state) => state.user);
+  const { error: errorMessage } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
+  console.log(loading, 'loading', errorMessage, 'errorMessage');
+
   const handleSubmit = async (e) => {
+    console.log(loading, 'loading55', errorMessage, 'e125rrorMessage');
+
     e.preventDefault();
     if (!formData.email || !formData.password) {
       return dispatch(signInFailure('Please fill all the fields'));
     }
     try {
       dispatch(signInStart());
-      const res = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (data.success === false) {
+      // const res = await fetch('/api/auth/signin', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData),
+      // });
+      const res = await axios.post(`${URL}/api/auth/signin`, formData);
+      const data = await res.data;
+      console.log(data, "dataresponse");
+
+      if (data === false) {
         dispatch(signInFailure(data.message));
       }
 
-      if (res.ok) {
+      if (res) {
         dispatch(signInSuccess(data));
         navigate('/');
       }

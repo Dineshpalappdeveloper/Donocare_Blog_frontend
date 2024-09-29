@@ -12,10 +12,15 @@ import { Link, useLocation } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { URL } from '../utils/Auth';
+import Cookies from "js-cookie";
 
 export default function DashSidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
+  const token = Cookies.get("token");
+
   const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState('');
   useEffect(() => {
@@ -27,11 +32,14 @@ export default function DashSidebar() {
   }, [location.search]);
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout', {
-        method: 'POST',
+      const res = await axios.post(`${URL}/api/user/signout`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const data = await res.json();
-      if (!res.ok) {
+
+      const data = await res.data;
+      if (!res) {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());

@@ -4,6 +4,9 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { set } from 'mongoose';
+import { URL } from '../utils/Auth';
+import axios from 'axios';
+import Cookies from "js-cookie";
 
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
@@ -11,12 +14,20 @@ export default function DashPosts() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState('');
+  const token = Cookies.get("token");
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
-        const data = await res.json();
-        if (res.ok) {
+
+        const res = await axios.get(`${URL}/api/post/getposts?userId=${currentUser._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.data;
+        if (res) {
           setUserPosts(data.posts);
           if (data.posts.length < 9) {
             setShowMore(false);
@@ -34,11 +45,16 @@ export default function DashPosts() {
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
-      const res = await fetch(
-        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
-      );
-      const data = await res.json();
-      if (res.ok) {
+
+      const res = await axios.get(`${URL}/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.data;
+
+      if (res) {
         setUserPosts((prev) => [...prev, ...data.posts]);
         if (data.posts.length < 9) {
           setShowMore(false);
@@ -52,14 +68,16 @@ export default function DashPosts() {
   const handleDeletePost = async () => {
     setShowModal(false);
     try {
-      const res = await fetch(
-        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
-        {
-          method: 'DELETE',
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
+
+
+      const res = await axios.delete(`${URL}/api/post/deletepost/${postIdToDelete}/${currentUser._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.data;
+      if (!res) {
         console.log(data.message);
       } else {
         setUserPosts((prev) =>
