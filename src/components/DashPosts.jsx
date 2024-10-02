@@ -105,6 +105,7 @@ export default function DashPosts() {
               <Table.HeadCell>Post image</Table.HeadCell>
               <Table.HeadCell>Post title</Table.HeadCell>
               <Table.HeadCell>Category</Table.HeadCell>
+              <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Delete</Table.HeadCell>
               <Table.HeadCell>
                 <span>Edit</span>
@@ -134,7 +135,15 @@ export default function DashPosts() {
                     </Link>
                   </Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
+                  {
+                    post?.status === 1 ?
+                      <Table.Cell><span className='bg-green-500 rounded-3xl p-2 text-white '>Active</span> </Table.Cell>
+                      :
+                      <Table.Cell><span className='bg-red-500 rounded-3xl p-2 text-white'>Inactive</span></Table.Cell>
+
+                  }
                   <Table.Cell>
+
                     <span
                       onClick={() => {
                         setShowModal(true);
@@ -168,7 +177,8 @@ export default function DashPosts() {
         </>
       ) : (
         <p>You have no posts yet!</p>
-      )}
+      )
+      }
       <Modal
         show={showModal}
         onClose={() => setShowModal(false)}
@@ -193,6 +203,6 @@ export default function DashPosts() {
           </div>
         </Modal.Body>
       </Modal>
-    </div>
+    </div >
   );
 }

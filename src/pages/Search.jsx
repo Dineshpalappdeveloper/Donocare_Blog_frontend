@@ -7,7 +7,7 @@ export default function Search() {
   const [sidebarData, setSidebarData] = useState({
     searchTerm: '',
     sort: 'desc',
-    category: 'uncategorized',
+    category: 'Technology',
   });
 
   console.log(sidebarData);
@@ -130,10 +130,10 @@ export default function Search() {
               value={sidebarData.category}
               id='category'
             >
-              <option value='uncategorized'>Uncategorized</option>
-              <option value='reactjs'>React.js</option>
-              <option value='nextjs'>Next.js</option>
-              <option value='javascript'>JavaScript</option>
+              <option value="uncategorized">Select a category</option>
+              <option value="Technology">Technology</option>
+              <option value="Bussiness">Bussiness</option>
+              <option value="Others">Others</option>
             </Select>
           </div>
           <Button type='submit' outline gradientDuoTone='purpleToPink'>

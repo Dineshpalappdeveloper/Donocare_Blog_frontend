@@ -1,12 +1,88 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MERN Blog</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <!-- Basic Meta Tags -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Donocare Blog - Insights and updates from Donocare Technology, covering the latest in technology, innovation, healthcare, and digital solutions." />
+  <meta name="keywords"
+    content="Donocare, Donocare Technology, Blog, Technology Blog, Innovation, Healthcare, Digital Solutions, Software Development" />
+  <meta name="author" content="Donocare Technology" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph Tags for Social Media -->
+  <meta property="og:title" content="Donocare Blog - Donocare Technology" />
+  <meta property="og:description"
+    content="Explore the latest articles from Donocare Technology on technology, innovation, healthcare, and digital solutions." />
+  <meta property="og:image" content="https://donocare.com/_next/static/media/logo.75fd32b0.jpg" />
+  <meta property="og:url" content="https://www.donocare.com/blog" />
+  <meta property="og:site_name" content="Donocare Blog" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card for Social Sharing -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Donocare Blog - Donocare Technology" />
+  <meta name="twitter:description"
+    content="Explore insights and updates from Donocare Technology covering the latest in tech, healthcare, and digital innovations." />
+  <meta name="twitter:image" content="https://donocare.com/_next/static/media/logo.75fd32b0.jpg" />
+
+  <!-- Canonical URL to avoid duplicate content -->
+  <link rel="canonical" href="https://www.donocare.com/blog" />
+
+  <!-- Schema.org Structured Data (JSON-LD for Blog) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Donocare Blog",
+    "url": "https://www.donocare.com/blog",
+    "description": "Insights and updates from Donocare Technology, covering the latest in technology, innovation, healthcare, and digital solutions.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Donocare Technology",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://donocare.com/_next/static/media/logo.75fd32b0.jpg"
+      }
+    },
+    "image": "https://donocare.com/_next/static/media/logo.75fd32b0.jpg",
+    "author": {
+      "@type": "Organization",
+      "name": "Donocare Technology"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://www.donocare.com/blog"
+    }
+  }
+  </script>
+
+  <!-- Mobile Optimization -->
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- Faster Page Load (Preconnect) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Enhanced Performance (Prefetching Assets) -->
+  <link rel="prefetch" href="https://donocare.com/_next/static/media/logo.75fd32b0.jpg" as="image">
+
+  <!-- Title for SEO -->
+  <title>Donocare Blog | Latest Technology and Healthcare Insights</title>
+
+  <!-- Favicons for multiple devices -->
+  <link rel="icon" href="https://donocare.com/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="https://donocare.com/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
